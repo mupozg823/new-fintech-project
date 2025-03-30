@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Insight Hub Pro</title>
+  <meta name="description" content="실시간 금융 데이터 분석 및 인사이트 제공 플랫폼">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js 라이브러리 추가 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- D3.js 라이브러리 추가 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud@1.2.5/build/d3.layout.cloud.min.js"></script>
+  
+  <!-- Base Styles -->
+  <style>
+    :root {
+      --primary-color: #4285F4;
+      --secondary-color: #34A853;
+      --accent-color: #FBBC05;
+      --error-color: #EA4335;
+      --text-primary: #202124;
+      --text-secondary: #5F6368;
+      --background-light: #FFFFFF;
+      --background-dark: #202124;
+    }
+    
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      background-color: #F8F9FA;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+    
+    .loading-pulse {
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <!-- 앱 컨테이너 -->
+  <div id="app">
+    <!-- 초기 로딩 상태 -->
+    <div class="loading-state" style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
+      <div style="margin-bottom: 20px;">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="loading-pulse">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#4285F4" stroke-width="2"/>
+          <path d="M12 6V12L16 16" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 style="font-size: 24px; margin-bottom: 8px; color: #202124;">Financial Insight Hub Pro</h2>
+      <p style="color: #5F6368;">애플리케이션을 초기화하는 중입니다...</p>
+    </div>
+  </div>
+  
+  <!-- 핵심 모듈 직접 로드 (비활성화) -->
+  <!-- 
+  <script>
+    // 더미 데이터 생성기
+    window.generateDummyData = function() {
+      console.log('더미 데이터 생성 중...');
+      
+      // 데이터 매니저가 없는 경우를 위한 더미 데이터
+      window.dummyData = {
+        articles: [],
+        insights: [],
+        sectors: []
+      };
+      
+      // 더미 기사 데이터 생성
+      for (let i = 0; i < 20; i++) {
+        const sectors = ['금융', '기술', '에너지', '헬스케어', '소비재'];
+        const sectorIndex = Math.floor(Math.random() * sectors.length);
+        
+        window.dummyData.articles.push({
+          id: 'article-' + i,
+          title: '금융 뉴스 기사 ' + (i + 1),
+          content: '이것은 더미 기사 내용입니다. 실제 데이터가 로드되지 않아 표시되는 임시 데이터입니다.',
+          source: '더미 소스',
+          publishedAt: new Date(Date.now() - i * 3600000),
+          url: '#',
+          sentiment: {
+            score: Math.random() * 2 - 1,
+            label: ['부정', '중립', '긍정'][Math.floor(Math.random() * 3)]
+          },
+          financialRelevance: Math.random() * 0.5 + 0.5,
+          sector: sectors[sectorIndex]
+        });
+      }
+      
+      // 더미 인사이트 생성
+      for (let i = 0; i < 5; i++) {
+        window.dummyData.insights.push({
+          id: 'insight-' + i,
+          title: '금융 인사이트 ' + (i + 1),
+          description: '이것은 더미 인사이트입니다. 실제 데이터가 로드되지 않아 표시되는 임시 데이터입니다.',
+          category: ['시장', '경제', '투자'][Math.floor(Math.random() * 3)],
+          importance: Math.floor(Math.random() * 10) + 1,
+          createdAt: new Date(Date.now() - i * 7200000)
+        });
+      }
+      
+      // 더미 섹터 데이터 생성
+      const sectorCount = { '금융': 0, '기술': 0, '에너지': 0, '헬스케어': 0, '소비재': 0 };
+      window.dummyData.articles.forEach(article => {
+        sectorCount[article.sector] = (sectorCount[article.sector] || 0) + 1;
+      });
+      
+      Object.entries(sectorCount).forEach(([sector, count]) => {
+        window.dummyData.sectors.push({
+          name: sector,
+          value: count
+        });
+      });
+      
+      // 키워드 데이터 생성
+      window.dummyData.keywords = [
+        {text: '금융', size: 25},
+        {text: '투자', size: 20},
+        {text: '경제', size: 18},
+        {text: '주식', size: 15},
+        {text: '시장', size: 12},
+        {text: '성장', size: 10},
+        {text: '기업', size: 9},
+        {text: '수익', size: 8},
+        {text: '위험', size: 7},
+        {text: '전략', size: 6}
+      ];
+      
+      console.log('더미 데이터 생성 완료:', window.dummyData);
+      return window.dummyData;
+    };
+    
+    // 더미 금융 허브 생성
+    window.createDummyHub = function() {
+      const dummyHub = {
+        isInitialized: true,
+        dataManager: {
+          getArticles: function() {
+            return window.dummyData.articles;
+          },
+          getInsights: function() {
+            return window.dummyData.insights;
+          },
+          getSectors: function() {
+            return window.dummyData.sectors;
+          },
+          getKeywords: function() {
+            return window.dummyData.keywords;
+          }
+        },
+        on: function(eventName, callback) {
+          console.log('더미 이벤트 리스너 등록:', eventName);
+          return true;
+        },
+        off: function(eventName, callback) {
+          console.log('더미 이벤트 리스너 제거:', eventName);
+          return true;
+        }
+      };
+      
+      return dummyHub;
+    };
+  </script>
+  -->
+  
+  <!-- 모듈 스크립트 로드 -->
+  <script type="module" src="./src/index.js"></script>
+  
+  <script>
+    // 전역 오류 처리
+    window.addEventListener('error', function(event) {
+      console.error('전역 오류 발생:', event.error);
+      
+      // 사용자 친화적인 오류 메시지 표시
+      const appContainer = document.getElementById('app');
+      if (appContainer) {
+        appContainer.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; padding: 20px; text-align: center;">
+            <div style="margin-bottom: 20px; color: #EA4335;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h2 style="font-size: 24px; margin-bottom: 16px; color: #202124;">오류가 발생했습니다</h2>
+            <p style="color: #5F6368; margin-bottom: 24px;">애플리케이션 실행 중 문제가 발생했습니다. 페이지를 새로고침하거나 나중에 다시 시도해주세요.</p>
+            <button onclick="location.reload()" style="background-color: #4285F4; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 500;">
+              페이지 새로고침
+            </button>
+          </div>
+        `;
+      }
+    });
+  </script>
+</body>
+</html> 
